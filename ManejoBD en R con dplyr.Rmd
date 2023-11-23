@@ -1,0 +1,128 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-11-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+#install.packages("palmerpenguins")
+install.packages("dplyr")
+library(dplyr)
+library(palmerpenguins)
+```
+
+
+```{r}
+dfPenguins <- penguins
+
+```
+
+```{r}
+#Seleccionar la columna especie, isla y sexo
+dfPenguins %>%
+  select(species, island, sex)
+
+dfPenguins[,c(1,2,7)]
+#dfPenguins[,c("species","island","sex")]
+#dfPenguins[names(dfPenguins) %in% c("species","island","sex")]
+
+```
+
+
+```{r}
+#Seleccionar la columna de especie e isla para el sexo masculino
+dfPenguins %>%
+  select(species, island, sex) %>%
+  filter(sex == "male")
+
+#Sin la columna isla
+dfPenguins %>%
+  select(species, island, sex) %>%
+  filter(sex == "male") %>%
+  select(-island)
+
+dfPenguins %>%
+  filter(sex == "male") %>%
+  select(species, sex)
+
+```
+
+```{r}
+#Crear columna con el cuadrado de la longitud de pico de los pinguinos hembras
+dfPenguins %>%
+  filter(sex == "female") %>%
+  mutate(bill_length_mm_2 = bill_length_mm^2,
+         flipper_length_mm_mitad = flipper_length_mm/2) %>%
+  select(bill_length_mm, bill_length_mm_2, flipper_length_mm, flipper_length_mm_mitad )
+
+```
+```{r}
+dfPenguins %>%
+  group_by(species) %>%
+  mutate(prom_longitud_pico = mean(bill_length_mm, na.rm = TRUE),
+         longitud_menos_promedio = bill_length_mm - prom_longitud_pico) %>%
+  select(species, bill_length_mm, prom_longitud_pico, longitud_menos_promedio) %>%
+  View()
+
+```
+
+```{r}
+dfPenguins %>%
+  group_by(species) %>%
+  summarise(prom_long_pico = mean(bill_length_mm, na.rm = TRUE),
+            desv_long_pico = sd(bill_length_mm, na.rm = TRUE))
+
+dfPenguins %>%
+  group_by(species, island) %>%
+  summarise(prom_long_pico = mean(bill_length_mm, na.rm = TRUE),
+            desv_long_pico = sd(bill_length_mm, na.rm = TRUE)) %>%
+  ungroup()
+
+```
+```{r}
+dfPenguins %>%
+  #arrange(-year)
+  #arrange(year)
+  #arrange(island)
+  #arrange(sex)
+  arrange(species, island, -year)
+
+```
+
+```{r}
+dfPenguins %>%
+  count(species, sort = TRUE, name = "frecuencia" )
+  #arrange(-n)
+
+dfPenguins %>%
+  count(species, sort = TRUE, name = "promedio", wt = mean(bill_length_mm, na.rm = TRUE))
+
+dfPenguins %>%
+  count(species, sort = TRUE, name = "promedio", wt = sum(bill_length_mm, na.rm = TRUE))
+
+dfPenguins %>%
+  count(species, island)
+
+install.packages("tidyr")
+library(tidyr)
+
+#tabla de doble entrada
+dfPenguins %>%
+  count(species, island) %>%
+  spread(key = "island",
+         value = "n", fill = 0)
+
+```
+
+
+
+
+
+
+
